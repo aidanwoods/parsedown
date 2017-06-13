@@ -1401,24 +1401,31 @@ class Parsedown
 
     protected function element(array $Element)
     {
-        $markup = '<'.$Element['name'];
+        $hasName = isset($Element['name']);
 
-        if (isset($Element['attributes']))
+        $markup = '';
+
+        if ($hasName)
         {
-            foreach ($Element['attributes'] as $name => $value)
-            {
-                if ($value === null)
-                {
-                    continue;
-                }
+            $markup .= '<'.$Element['name'];
 
-                $markup .= ' '.$name.'="'.$value.'"';
+            if (isset($Element['attributes']))
+            {
+                foreach ($Element['attributes'] as $name => $value)
+                {
+                    if ($value === null)
+                    {
+                        continue;
+                    }
+
+                    $markup .= ' '.$name.'="'.$value.'"';
+                }
             }
         }
 
         if (isset($Element['text']))
         {
-            $markup .= '>';
+            $markup .= $hasName ? '>' : '';
 
             if (isset($Element['handler']))
             {
@@ -1429,9 +1436,9 @@ class Parsedown
                 $markup .= $Element['text'];
             }
 
-            $markup .= '</'.$Element['name'].'>';
+            $markup .= $hasName ? '</'.$Element['name'].'>' : '';
         }
-        else
+        elseif ($hasName)
         {
             $markup .= ' />';
         }
