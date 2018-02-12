@@ -1,6 +1,8 @@
 <?php
 
-class ParsedownTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ParsedownTest extends TestCase
 {
     final function __construct($name = null, array $data = array(), $dataName = '')
     {
@@ -27,7 +29,7 @@ class ParsedownTest extends PHPUnit_Framework_TestCase
      */
     protected function initParsedown()
     {
-        $Parsedown = new Parsedown();
+        $Parsedown = new TestParsedown();
 
         return $Parsedown;
     }
@@ -45,6 +47,8 @@ class ParsedownTest extends PHPUnit_Framework_TestCase
 
         $expectedMarkup = str_replace("\r\n", "\n", $expectedMarkup);
         $expectedMarkup = str_replace("\r", "\n", $expectedMarkup);
+
+        $this->Parsedown->setSafeMode(substr($test, 0, 3) === 'xss');
 
         $actualMarkup = $this->Parsedown->text($markdown);
 
@@ -132,15 +136,14 @@ color: red;
 <p>comment</p>
 <p>&lt;!-- html comment --&gt;</p>
 EXPECTED_HTML;
-        $parsedownWithNoMarkup = new Parsedown();
+
+        $parsedownWithNoMarkup = new TestParsedown();
         $parsedownWithNoMarkup->setMarkupEscaped(true);
         $this->assertEquals($expectedHtml, $parsedownWithNoMarkup->text($markdownWithHtml));
     }
 
     public function testLateStaticBinding()
     {
-        include __DIR__ . '/TestParsedown.php';
-
         $parsedown = Parsedown::instance();
         $this->assertInstanceOf('Parsedown', $parsedown);
 
