@@ -1455,29 +1455,36 @@ class Parsedown
 
     protected function element(array $Element)
     {
+        $hasName = isset($Element['name']);
+
         if ($this->safeMode)
         {
             $Element = $this->sanitiseElement($Element);
         }
 
-        $markup = '<'.$Element['name'];
+        $markup = '';
 
-        if (isset($Element['attributes']))
+        if ($hasName)
         {
-            foreach ($Element['attributes'] as $name => $value)
-            {
-                if ($value === null)
-                {
-                    continue;
-                }
+            $markup .= '<'.$Element['name'];
 
-                $markup .= ' '.$name.'="'.self::escape($value).'"';
+            if (isset($Element['attributes']))
+            {
+                foreach ($Element['attributes'] as $name => $value)
+                {
+                    if ($value === null)
+                    {
+                        continue;
+                    }
+
+                    $markup .= ' '.$name.'="'.self::escape($value).'"';
+                }
             }
         }
 
         if (isset($Element['text']))
         {
-            $markup .= '>';
+            $markup .= $hasName ? '>' : '';
 
             if (!isset($Element['nonNestables'])) 
             {
@@ -1493,9 +1500,9 @@ class Parsedown
                 $markup .= self::escape($Element['text'], true);
             }
 
-            $markup .= '</'.$Element['name'].'>';
+            $markup .= $hasName ? '</'.$Element['name'].'>' : '';
         }
-        else
+        elseif ($hasName)
         {
             $markup .= ' />';
         }
